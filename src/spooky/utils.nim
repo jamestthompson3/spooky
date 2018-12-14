@@ -1,4 +1,4 @@
-import os, system, strutils
+import os, system, strutils, terminal
 
 include nodeBuilds
 
@@ -19,3 +19,11 @@ proc nodeProject*(projectName: string) =
   else:
     buildClient(projectName, packageManager, install)
 
+template colorEcho*(s: string, fg: ForegroundColor) =
+  setForeGroundColor(fg, true)
+  s.writeStyled({})
+  resetAttributes()
+  echo ""
+
+proc replaceVars*(line: string, varName: string) =
+ echo line

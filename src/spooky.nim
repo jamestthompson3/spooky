@@ -1,16 +1,5 @@
-import spooky/utils, strutils, os, re, sequtils, tables, terminal
+import spooky/utils, strutils, os, sequtils, terminal
 
-var
-  marker: int = 1
-  varMap = initTable[string, pointer]()
-
-proc parseConfig(content: seq[string]) =
-  for i in content:
-    if i == "":
-      continue
-    colorEcho("$1:" % i, fgBlue)
-    var input: string = readLine(stdin)
-    varMap.add($input, marker.addr)
 
 proc main =
   echo """
@@ -51,22 +40,13 @@ proc main =
       discard execShellCmd("git clone $1 $2" % [templatePath, projectName])
       setCurrentDir("./$1" % projectName)
       discard execShellCmd("rm -rf .git")
+      parseTemplate(projectName)
     else:
       templatePath.removePrefix({'"'})
       templatePath.removeSuffix({'"'})
-      if fileExists("$1/bones" % templatePath):
-        parseConfig(toSeq(lines("$1/bones" % templatePath)))
-        copyDir(templatePath, "./$1" % projectName)
-        for file in walkDirRec("./$1" % projectName):
-          for varName in varMap.keys():
-            echo "{{ $1 }}" % varName
-            var fileLines: seq[string] = toSeq(lines(file))
-            if fileLines.anyIt(contains(it, varName)):
-              for line in fileLines:
-                replaceVars(line, varName)
-                # TODO write file with new contents
-
-
+      copyDir(templatePath, "./$1" % projectName)
+      setCurrentDir("./$1" % projectName)
+      parseTemplate(projectName)
   else:
     echo "What tech are you using?"
     echo "(1) Node"

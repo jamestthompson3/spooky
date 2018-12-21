@@ -1,6 +1,22 @@
-import os, system, strutils, terminal
+import os, system, strutils, terminal, sequtils, tables
 
 include nodeBuilds
+
+template colorEcho*(s: string, fg: ForegroundColor) =
+  setForeGroundColor(fg, true)
+  s.writeStyled({})
+  resetAttributes()
+  echo ""
+
+proc parseConfig(content: seq[string]): Table[ string, string ] =
+  var varMap = initTable[string, string]()
+  for line in content:
+    if line == "":
+      continue
+    colorEcho("$1:" % line, fgBlue)
+    var input: string = readLine(stdin)
+    varMap.add(line, input)
+  return varMap
 
 proc install(deps: string, devDeps: string) =
   if execShellCmd(deps) == 1:
@@ -19,11 +35,22 @@ proc nodeProject*(projectName: string) =
   else:
     buildClient(projectName, packageManager, install)
 
-template colorEcho*(s: string, fg: ForegroundColor) =
-  setForeGroundColor(fg, true)
-  s.writeStyled({})
-  resetAttributes()
-  echo ""
+proc parseTemplate*(projectName: string) =
+  if fileExists("./bones"):
+    var varMap = parseConfig(toSeq(lines("./bones")))
+    for file in walkDirRec("./$1" % projectName):
+      for varName in varMap.keys():
+        let replacementString = "{{ $1 }}" % varName
+        file.writeFile file.readFile.replace(replacementString, varMap[varName])
+    echo """
+    ******************
+    *                *
+    * Ready to roll! *
+    *                *
+    ******************
+    """
+  else:
+    echo "No config file found, exiting"
 
-proc replaceVars*(line: string, varName: string) =
- echo line
+
+

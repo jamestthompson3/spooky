@@ -59,6 +59,6 @@ proc parseTemplate*(projectName: string) =
         let replacementString = "{{ $1 }}" % varName
         file.writeFile file.readFile.replace(replacementString, varMap[varName])
         success()
-      else:
+  else:
     echo "No config file found, exiting"
 

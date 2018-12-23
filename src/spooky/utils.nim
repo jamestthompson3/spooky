@@ -48,7 +48,7 @@ proc nodeProject*(projectName: string) =
 
 proc nimProject*(projectName: string) =
   createDir("$1/$2/src" % [getCurrentDir(),projectName])
-  setCurrentDir("./$1/$2" % [ getCurrentDir(), projectName ])
+  setCurrentDir("$1/$2" % [getCurrentDir(), projectName])
   writeFile("./src/$1.nim" % projectName, src)
   success()
 

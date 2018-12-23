@@ -49,11 +49,13 @@ proc main =
       parseTemplate(projectName)
   else:
     echo "What tech are you using?"
-    echo "(1) Node"
+    echo "(1) Node (2) Nim"
 
     var tech: string = readLine(stdin)
     if tech == "1":
       nodeProject(projectName)
+    elif tech == "2":
+      nimProject(projectName)
     else:
       echo "Unsupported type"
 

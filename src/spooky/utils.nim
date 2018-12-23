@@ -1,12 +1,21 @@
 import os, system, strutils, terminal, sequtils, tables
 
-include nodeBuilds
+include nodeBuilds, nimBuilds
 
 template colorEcho*(s: string, fg: ForegroundColor) =
   setForeGroundColor(fg, true)
   s.writeStyled({})
   resetAttributes()
   echo ""
+
+proc success() =
+  echo """
+      ******************
+      *                *
+      * Ready to roll! *
+      *                *
+      ******************
+      """
 
 proc parseConfig(content: seq[string]): Table[ string, string ] =
   var varMap = initTable[string, string]()
@@ -34,6 +43,13 @@ proc nodeProject*(projectName: string) =
     buildServer(projectName, packageManager, install)
   else:
     buildClient(projectName, packageManager, install)
+  success()
+
+proc nimProject*(projectName: string) =
+  createDir("$1/$2/src" % [getCurrentDir(),projectName])
+  setCurrentDir("./$1/$2" % [ getCurrentDir(), projectName ])
+  writeFile("./src/$1.nim" % projectName, src)
+  success()
 
 proc parseTemplate*(projectName: string) =
   if fileExists("./bones"):
@@ -42,15 +58,7 @@ proc parseTemplate*(projectName: string) =
       for varName in varMap.keys():
         let replacementString = "{{ $1 }}" % varName
         file.writeFile file.readFile.replace(replacementString, varMap[varName])
-    echo """
-    ******************
-    *                *
-    * Ready to roll! *
-    *                *
-    ******************
-    """
-  else:
+        success()
+      else:
     echo "No config file found, exiting"
-
-
 

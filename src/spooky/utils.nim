@@ -10,6 +10,7 @@ template colorEcho*(s: string, fg: ForegroundColor) =
 
 proc success() =
   echo """
+
       ******************
       *                *
       * Ready to roll! *
@@ -20,7 +21,7 @@ proc success() =
 proc parseConfig(content: seq[string]): Table[ string, string ] =
   var varMap = initTable[string, string]()
   for line in content:
-    if line == "":
+    if line == "" or line.contains("#"):
       continue
     colorEcho("$1:" % line, fgBlue)
     var input: string = readLine(stdin)

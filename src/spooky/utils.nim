@@ -65,7 +65,7 @@ proc parseTemplate*(projectName: string) =
           echo file
           fileLines = fileLines.mapIt(it.replace(replacementString, varMap[varName]))
       file.writeFile foldl(fileLines, a & b)
-    # success()
+    success()
   else:
     echo "No config file found, exiting"
 

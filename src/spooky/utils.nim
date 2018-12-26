@@ -55,11 +55,17 @@ proc nimProject*(projectName: string) =
 proc parseTemplate*(projectName: string) =
   if fileExists("./bones"):
     var varMap = parseConfig(toSeq(lines("./bones")))
-    for file in walkDirRec("./$1" % projectName):
+    for file in walkDirRec("./"):
+      if file.contains("bones"):
+        continue
+      var fileLines: seq[string] = toSeq(lines(file))
       for varName in varMap.keys():
         let replacementString = "{{ $1 }}" % varName
-        file.writeFile file.readFile.replace(replacementString, varMap[varName])
-        success()
+        if fileLines.anyIt(it.contains(replacementString)):
+          echo file
+          fileLines = fileLines.mapIt(it.replace(replacementString, varMap[varName]))
+      file.writeFile foldl(fileLines, a & b)
+    # success()
   else:
     echo "No config file found, exiting"
 

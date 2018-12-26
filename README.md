@@ -3,6 +3,7 @@
 ## Usage
 
 After compiling the source code, just add the executable to your path and run `spooky`
+Alternatively, you could use `nimble` to compile and install spooky.
 
 ## Config files
 
